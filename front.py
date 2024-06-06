@@ -9,34 +9,28 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
     ventana_tabla.title("Tabla de simulación")
 
     # Crear la tabla
-    tabla = ttk.Treeview(ventana_tabla, columns=("Evento", "Reloj", 
-    "Rnd Llegada Futbol", "Tiempo Llegada Futbol", 
-    "Proxima Llegada Futbol", "Rnd Llegada Handball", 
-    "Tiempo Llegada Handball", "Proxima Llegada Handball", 
-    "Rnd Llegada Basquet", "Tiempo Llegada Basquet",
-    "Proxima Llegada Basquet","Estado Cancha", "Cola Cancha", 
-    "Rnd Ocupacion Futbol", "Tiempo Ocupacion Futbol", 
-    "Hora Ocupacion Futbol",  "Rnd Ocupacion Handball", 
-    "Tiempo Ocupacion Handball", "Hora Ocupacion Handball",  
-    "Rnd Ocupacion Basquet", "Tiempo Ocupacion Basquet", 
-    "Hora Ocupacion Basquet", "Fin Limpieza", "Fin dia", 
-    "++ Tiempo Cola Futbol", "Cant Gru Futbol", "Prom Espera Futbol",
-    "++ Tiempo Cola Handball", "Cant Gru Handball", 
-    "Prom Espera Handball", "++ Tiempo Cola Basquet", 
-    "Cant Gru Basquet", "Prom Espera Basquet", "++Tiempo Ocup Cancha",
-    "Acum Tiempo Cancha Libre", "Cantidad Dias", 
-    "Prom Tiempo Libre x Dia", "Estado Grupo", "Tipo Grupo", "Hora Grupo" ), show="headings")
-    
-    # Configurar encabezados de columnas con alineación hacia la izquierda
-    for col in tabla["columns"]:
-        tabla.heading(col, text=col, anchor="w")
+    columnas = (
+        "Evento", "Reloj", "Rnd Llegada Futbol", "Tiempo Llegada Futbol",
+        "Proxima Llegada Futbol", "Rnd Llegada Handball", "Tiempo Llegada Handball",
+        "Proxima Llegada Handball", "Rnd Llegada Basquet", "Tiempo Llegada Basquet",
+        "Proxima Llegada Basquet", "Estado Cancha", "Cola Cancha",
+        "Rnd Ocupacion Futbol", "Tiempo Ocupacion Futbol", "Hora Ocupacion Futbol",
+        "Rnd Ocupacion Handball", "Tiempo Ocupacion Handball", "Hora Ocupacion Handball",
+        "Rnd Ocupacion Basquet", "Tiempo Ocupacion Basquet", "Hora Ocupacion Basquet",
+        "Fin Limpieza", "Fin dia", "++ Tiempo Cola Futbol", "Cant Gru Futbol",
+        "Prom Espera Futbol", "++ Tiempo Cola Handball", "Cant Gru Handball",
+        "Prom Espera Handball", "++ Tiempo Cola Basquet", "Cant Gru Basquet",
+        "Prom Espera Basquet", "++Tiempo Ocup Cancha", "Acum Tiempo Cancha Libre",
+        "Cantidad Dias", "Prom Tiempo Libre x Dia", "Estado Grupo", "Tipo Grupo", "Hora Grupo"
+    )
+
+    tabla = ttk.Treeview(ventana_tabla, columns=columnas, show="headings")
+
+    # Configurar encabezados de columnas con alineación centrada
+    for col in columnas:
+        tabla.heading(col, text=col, anchor="center")
+        tabla.column(col, anchor="center")
         
-    # Ajustar el ancho de las columnas
-    for i, col in enumerate(tabla["columns"]):
-        if i < 2:  # Las dos primeras columnas
-            tabla.column(col, width=60)
-        else:  # Todas las demás columnas
-            tabla.column(col, width=150)
             
     
             
@@ -50,12 +44,27 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
     # Agregar la tabla a la ventana
     tabla.pack(expand=True, fill="both")
     
-    #Agregar Filas a la tabla
-    datos = [0,1]
-    tabla.insert("", "end", values=datos)
+    #Calcular 1ra fila
+    evento = 'Inicial'
+    reloj = 0
+    llegada_f = llegada_futbol(reloj, futbol_llegada_media)
+    llegada_h =  distribucion_uniforme(reloj, *handball_llegada_uniforme)
+    llegada_b =  distribucion_uniforme(reloj, *basketball_llegada_uniforme)
+    ocupacion_f = 9999
+    ocupacion_h = 9999
+    ocupacion_b = 9999
+    fin_limpieza = 9999
+    fila = [evento, reloj, *llegada_f, *llegada_h, *llegada_b, 'L', 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+    #Agregar 1ra fila a la tabla
+    tabla.insert("", "end", values=fila)
     
-
-
+    #Calcular el resto de las filas
+    #while reloj <= valor_tiempo_x:
+    evento, reloj = evento_reloj(llegada_f[2], llegada_h[2], llegada_b[2], ocupacion_f, ocupacion_h, ocupacion_b, fin_limpieza )
+    fila = [evento, reloj] 
+    tabla.insert("", "end", values=fila)  
+    
+    
     
     
 def cargar_datos():
