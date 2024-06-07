@@ -6,10 +6,10 @@ def validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo
     return True
 
 def rnd():
-    return round(random.random(),4)
+    return round(random.uniform(0.1, 1), 4)
 
 #Calculo de llegada de futbol con distribucion exponencial negativa
-def llegada_futbol(reloj, media):
+def distribucion_exponencial(reloj, media):
     rand = rnd()
     calculos = [rand]
     tiempo = round(-media * math.log(1 - rand),4)
@@ -22,9 +22,9 @@ def llegada_futbol(reloj, media):
 def distribucion_uniforme(reloj, li, ls):
     rand = rnd()
     calculos = [rand]
-    tiempo = li +(ls-li) * rand
+    tiempo = round(li +(ls-li) * rand,4)
     calculos.append(tiempo)
-    prox_llegada = reloj +  tiempo
+    prox_llegada = round(reloj +  tiempo,4)
     calculos.append(prox_llegada)
     return calculos
 
@@ -40,11 +40,15 @@ def evento_reloj(llegada_f, llegada_h, llegada_b, ocupacion_f, ocupacion_h, ocup
         'Fin limpieza'
     ]
     
-    tiempo_evento_proximo = min(eventos)
+    # Filtrar eventos que no sean 0
+    eventos_filtrados = [e for e in eventos if e != 0]
+    tiempo_evento_proximo = min(eventos_filtrados)
     indice_evento_proximo = eventos.index(tiempo_evento_proximo)
     evento_proximo = nombres_eventos[indice_evento_proximo]
     
     return evento_proximo, tiempo_evento_proximo
+
+
 
 
 
