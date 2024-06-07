@@ -31,9 +31,6 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
         tabla.heading(col, text=col, anchor="center")
         tabla.column(col, anchor="center")
         
-            
-    
-            
     # Crear scrollbar horizontal
     scrollbar_horizontal = tk.Scrollbar(ventana_tabla, orient="horizontal", command=tabla.xview)
     scrollbar_horizontal.pack(fill="x", side="bottom")
@@ -44,10 +41,9 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
     # Agregar la tabla a la ventana
     tabla.pack(expand=True, fill="both")
     
-    #Calcular 1ra fila
-    contador_equipos_f = 0
-    contador_equipos_h = 0
-    contador_equipos_b = 0
+    #Calcular 1ra fila inicializacion
+    contador_equipos = 0
+    equipos_cola = []
     evento = 'Inicial'
     reloj = 0
     vector_llegada_f = distribucion_exponencial(reloj, media)
@@ -58,7 +54,6 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
     vector_ocupacion_b = [0,0,0]
     fin_limpieza = 0
     estado_cancha = 'Libre'
-    cola_cancha = 0
     fin_dia = 24
     tiempo_cola_f = 0
     cantidad_grupo_f = 0
@@ -74,32 +69,54 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
     cantidad_dias = 1
     promedio_tiempo_libre_dia = 0
     vector_grupos = [' ',' ',' ']
-    fila = [evento, reloj, *vector_llegada_f, *vector_llegada_h, *vector_llegada_b, estado_cancha, cola_cancha, *vector_ocupacion_f, *vector_ocupacion_h, *vector_ocupacion_b, fin_limpieza, fin_dia, tiempo_cola_f, cantidad_grupo_f, promedio_espera_f, tiempo_cola_h, cantidad_grupo_h, promedio_espera_h, tiempo_cola_b, cantidad_grupo_b, promedio_espera_b, tiempo_cancha_ocupado_dia, acumulador_tiempo_cancha_libre, cantidad_dias, promedio_tiempo_libre_dia, *vector_grupos]
+    fila = [evento, reloj, *vector_llegada_f, *vector_llegada_h, *vector_llegada_b, estado_cancha, len(equipos_cola), *vector_ocupacion_f, *vector_ocupacion_h, *vector_ocupacion_b, fin_limpieza, fin_dia, tiempo_cola_f, cantidad_grupo_f, promedio_espera_f, tiempo_cola_h, cantidad_grupo_h, promedio_espera_h, tiempo_cola_b, cantidad_grupo_b, promedio_espera_b, tiempo_cancha_ocupado_dia, acumulador_tiempo_cancha_libre, cantidad_dias, promedio_tiempo_libre_dia, *vector_grupos]
     #Agregar 1ra fila a la tabla
     tabla.insert("", "end", values=fila)
     
     #Calcular el resto de las filas
+    
     #while reloj <= valor_tiempo_x:
     evento, reloj = evento_reloj(vector_llegada_f[2], vector_llegada_h[2], vector_llegada_b[2], vector_ocupacion_f[2], vector_ocupacion_h[2], vector_ocupacion_b[2], fin_limpieza )
+    #Calculos de filas si el evento es llegada futbol
+    
     if evento == 'Llegada futbol':
-        contador_equipos_f += 1
+        contador_equipos += 1
         vector_llegada_f = distribucion_exponencial(reloj, media) 
         vector_ocupacion_f = distribucion_uniforme(reloj, *futbol_ocupacion_uniforme)
         estado_cancha = 'Ocupado'
-        vector_grupos = ['Jugando' + str(contador_equipos_f), 'Futbol', reloj]
+        vector_grupos = ['Jugando ' + str(contador_equipos), 'Futbol', reloj]
         
-        #Revisar para varias llegadas de futbol
-        if fin_limpieza > vector_llegada_f[2]:
-            cola_cancha += 1
+        #Aumento la cantidad de cola
+        if estado_cancha != 'L':
+            equipos_cola.append('futbol')
 
-        #Tmb revisar
-        if cola_cancha != 0:
-            tiempo_cola_f = reloj
-            if tiempo_cola_f != 0:
-                promedio_espera_f = cantidad_grupo_f / tiempo_cola_f
+                
+    #Calculos de filas si el evento es llegada handball
+    if evento == 'Llegada handball':
+        contador_equipos += 1
+        vector_llegada_h = distribucion_uniforme(reloj, *handball_llegada_uniforme)
+        vector_ocupacion_h = distribucion_uniforme(reloj, *handball_ocupacion_uniforme)
+        estado_cancha = 'Ocupado'
+        vector_grupos = ['Jugando ' + str(contador_equipos), 'Handball', reloj]
+        
+        #Aumento la cantidad de cola
+        if estado_cancha != 'L':
+            equipos_cola.append('handball')
+        
+    #Calculos de filas si el evento es llegada basquet
+    if evento == 'Llegada basquet':
+        contador_equipos += 1
+        vector_llegada_b = distribucion_uniforme(reloj, *basketball_llegada_uniforme)
+        vector_ocupacion_b = distribucion_uniforme(reloj, *basketball_ocupacion_uniforme)
+        estado_cancha = 'Ocupado'
+        vector_grupos = ['Jugando ' + str(contador_equipos), 'Basquet', reloj]
+        
+        #Aumento la cantidad de cola
+        if estado_cancha != 'L':
+            equipos_cola.append('basquet')
         
     #Insertar cada fila en la tabla   
-    fila = [evento, reloj, *vector_llegada_f, *vector_llegada_h, *vector_llegada_b, estado_cancha, cola_cancha, *vector_ocupacion_f, *vector_ocupacion_h, *vector_ocupacion_b, fin_limpieza, fin_dia, tiempo_cola_f, cantidad_grupo_f, promedio_espera_f, tiempo_cola_h, cantidad_grupo_h, promedio_espera_h, tiempo_cola_b, cantidad_grupo_b, promedio_espera_b, tiempo_cancha_ocupado_dia, acumulador_tiempo_cancha_libre, cantidad_dias, promedio_tiempo_libre_dia, *vector_grupos] 
+    fila = [evento, reloj, *vector_llegada_f, *vector_llegada_h, *vector_llegada_b, estado_cancha, len(equipos_cola), *vector_ocupacion_f, *vector_ocupacion_h, *vector_ocupacion_b, fin_limpieza, fin_dia, tiempo_cola_f, cantidad_grupo_f, promedio_espera_f, tiempo_cola_h, cantidad_grupo_h, promedio_espera_h, tiempo_cola_b, cantidad_grupo_b, promedio_espera_b, tiempo_cancha_ocupado_dia, acumulador_tiempo_cancha_libre, cantidad_dias, promedio_tiempo_libre_dia, *vector_grupos] 
     tabla.insert("", "end", values=fila)  
     
     
