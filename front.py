@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as messagebox
 from back import *
+from objetos import simulacion as sim
+
 
 def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme):
     # Crear una ventana
@@ -198,7 +200,7 @@ def cargar_datos():
     
 def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme):
     # Obtener los valores ingresados por el usuario
-    valor_tiempo_x = tiempo_x.get()
+    valor_tiempo_x = tiempo_x.get() # tiempo a simular
     iteracion_i = valor_i.get()
     hora_j = valor_j.get()
     cantidad_cola_max = cola_max.get()
@@ -213,6 +215,10 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_
     # Validar las probabilidades y puntos
     valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme)
 
+    #Creamos la sminulacion
+    simulacion = sim.Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, *handball_llegada_uniforme,
+                                *basketball_llegada_uniforme, *futbol_ocupacion_uniforme, *handball_ocupacion_uniforme, *basketball_ocupacion_uniforme)
+    print(simulacion)
     # Mostrar resultado
     if valido:
         messagebox.showinfo("Éxito", "Datos CORRECTAMENTE cargados.")
