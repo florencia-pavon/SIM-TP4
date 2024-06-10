@@ -14,6 +14,8 @@ class Grupo(ABC):
         self.rndFin = None
         self.tiempoFin = None
         self.horaFin = None
+        self.horaLlegaCola = None
+        self.tiempoEnCola = 0
         self.initialize()
 
     @abstractmethod
@@ -26,6 +28,41 @@ class Grupo(ABC):
         self.rndFin = datosOcupacion[0]
         self.tiempoFin = datosOcupacion[1]
         self.horaFin = datosOcupacion[2]
+
+        print(datosOcupacion)
+
+        return datosOcupacion[2]
+    
+
+    def enCola(self, reloj):
+        self.estado = 'En Cola'
+        self.horaLlegaCola = reloj
+
+
+    def jugando(self, reloj, limInf, limSup):
+        self.estado = 'Jugando'
+        
+        # Si el grupo hizo la cola, calculamos el tiempo que estuvo
+        self.calcularTiempoEnCola(reloj)
+
+        return self.calcularDuracion(reloj, limInf, limSup)
+
+
+    def calcularTiempoEnCola(self, reloj):
+        if self.horaLlegaCola != None:
+            self.tiempoEnCola = reloj - self.horaLlegaCola
+
+    
+    def getTiempoEnCola(self):
+        return self.tiempoEnCola
+
+
+    def getVectorLlegada(self):
+        return [self.rndCreacion, self.tiempoLlegada, self.proximaLlegada]
+    
+
+    def getVectorOcupacion(self):
+        return [self.rndFin, self.tiempoFin, self.horaFin]
 
 
 class Futbol(Grupo):

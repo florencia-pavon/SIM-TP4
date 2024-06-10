@@ -2,10 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as messagebox
 from back import *
-from objetos import simulacion as sim
+from simulacion import *
 
 
-def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme):
+def crearTabla(simulacion):
     # Crear una ventana
     ventana_tabla = tk.Toplevel()
     ventana_tabla.title("Tabla de simulación")
@@ -15,16 +15,13 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
         "Evento", "Reloj", "Rnd Llegada Futbol", "Tiempo Llegada Futbol",
         "Proxima Llegada Futbol", "Rnd Llegada Handball", "Tiempo Llegada Handball",
         "Proxima Llegada Handball", "Rnd Llegada Basquet", "Tiempo Llegada Basquet",
-        "Proxima Llegada Basquet", "Estado Cancha", "Cola Cancha",
-        "Rnd Ocupacion Futbol", "Tiempo Ocupacion Futbol", "Hora Ocupacion Futbol",
-        "Rnd Ocupacion Handball", "Tiempo Ocupacion Handball", "Hora Ocupacion Handball",
-        "Rnd Ocupacion Basquet", "Tiempo Ocupacion Basquet", "Hora Ocupacion Basquet",
-        "Fin Limpieza", "Fin dia", "++ Tiempo Cola Futbol", "Cant Gru Futbol",
+        "Proxima Llegada Basquet", "Estado Cancha", "Cola Cancha", "Tipo Equipo en Ocupacion",
+        "Rnd Ocupacion", "Tiempo Ocupacion", "Hora Fin Ocupacion",
+        "Fin Limpieza", "++ Tiempo Cola Futbol", "Cant Gru Futbol",
         "Prom Espera Futbol", "++ Tiempo Cola Handball", "Cant Gru Handball",
         "Prom Espera Handball", "++ Tiempo Cola Basquet", "Cant Gru Basquet",
-        "Prom Espera Basquet", "++Tiempo Ocup Cancha", "Acum Tiempo Cancha Libre",
-        "Cantidad Dias", "Prom Tiempo Libre x Dia", "Estado Grupo", "Tipo Grupo", "Hora Grupo"
-    )
+        "Prom Espera Basquet", "Acum Tiempo Cancha Libre",
+        "Cantidad Dias", "Prom Tiempo Libre x Dia") # "Estado Grupo", "Tipo Grupo", "Hora Grupo"
 
     tabla = ttk.Treeview(ventana_tabla, columns=columnas, show="headings")
 
@@ -40,88 +37,15 @@ def simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpi
     # Asociar la scrollbar con la tabla
     tabla.configure(xscrollcommand=scrollbar_horizontal.set)
 
+    # le mandamos la tabla a la simulacion
+    simulacion.setTabla(tabla)
+
+    simulacion.avanzarTiempo()
+
+    tablaActualizada = simulacion.getTabla()
+
     # Agregar la tabla a la ventana
     tabla.pack(expand=True, fill="both")
-    
-    #Calcular 1ra fila inicializacion
-    contador_equipos = 0
-    equipos_cola = []
-    evento = 'Inicial'
-    reloj = 0
-    vector_llegada_f = distribucion_exponencial(reloj, media)
-    vector_llegada_h =  distribucion_uniforme(reloj, *handball_llegada_uniforme)
-    vector_llegada_b =  distribucion_uniforme(reloj, *basketball_llegada_uniforme)
-    vector_ocupacion_f = [0,0,0]
-    vector_ocupacion_h = [0,0,0]
-    vector_ocupacion_b = [0,0,0]
-    fin_limpieza = 0
-    estado_cancha = 'Libre'
-    fin_dia = 24
-    tiempo_cola_f = 0
-    cantidad_grupo_f = 0
-    promedio_espera_f = 0
-    tiempo_cola_h = 0
-    cantidad_grupo_h = 0
-    promedio_espera_h = 0
-    tiempo_cola_b = 0
-    cantidad_grupo_b = 0
-    promedio_espera_b = 0
-    tiempo_cancha_ocupado_dia = 0
-    acumulador_tiempo_cancha_libre = 0
-    cantidad_dias = 1
-    promedio_tiempo_libre_dia = 0
-    vector_grupos = [' ',' ',' ']
-    fila = [evento, reloj, *vector_llegada_f, *vector_llegada_h, *vector_llegada_b, estado_cancha, len(equipos_cola), *vector_ocupacion_f, *vector_ocupacion_h, *vector_ocupacion_b, fin_limpieza, fin_dia, tiempo_cola_f, cantidad_grupo_f, promedio_espera_f, tiempo_cola_h, cantidad_grupo_h, promedio_espera_h, tiempo_cola_b, cantidad_grupo_b, promedio_espera_b, tiempo_cancha_ocupado_dia, acumulador_tiempo_cancha_libre, cantidad_dias, promedio_tiempo_libre_dia, *vector_grupos]
-    #Agregar 1ra fila a la tabla
-    tabla.insert("", "end", values=fila)
-    
-    #Calcular el resto de las filas
-    
-    #while reloj <= valor_tiempo_x:
-    evento, reloj = evento_reloj(vector_llegada_f[2], vector_llegada_h[2], vector_llegada_b[2], vector_ocupacion_f[2], vector_ocupacion_h[2], vector_ocupacion_b[2], fin_limpieza )
-    #Calculos de filas si el evento es llegada futbol
-    
-    if evento == 'Llegada futbol':
-        contador_equipos += 1
-        vector_llegada_f = distribucion_exponencial(reloj, media) 
-        vector_ocupacion_f = distribucion_uniforme(reloj, *futbol_ocupacion_uniforme)
-        estado_cancha = 'Ocupado'
-        vector_grupos = ['Jugando ' + str(contador_equipos), 'Futbol', reloj]
-        
-        #Aumento la cantidad de cola
-        if estado_cancha != 'L':
-            equipos_cola.append('futbol')
-
-                
-    #Calculos de filas si el evento es llegada handball
-    if evento == 'Llegada handball':
-        contador_equipos += 1
-        vector_llegada_h = distribucion_uniforme(reloj, *handball_llegada_uniforme)
-        vector_ocupacion_h = distribucion_uniforme(reloj, *handball_ocupacion_uniforme)
-        estado_cancha = 'Ocupado'
-        vector_grupos = ['Jugando ' + str(contador_equipos), 'Handball', reloj]
-        
-        #Aumento la cantidad de cola
-        if estado_cancha != 'L':
-            equipos_cola.append('handball')
-        
-    #Calculos de filas si el evento es llegada basquet
-    if evento == 'Llegada basquet':
-        contador_equipos += 1
-        vector_llegada_b = distribucion_uniforme(reloj, *basketball_llegada_uniforme)
-        vector_ocupacion_b = distribucion_uniforme(reloj, *basketball_ocupacion_uniforme)
-        estado_cancha = 'Ocupado'
-        vector_grupos = ['Jugando ' + str(contador_equipos), 'Basquet', reloj]
-        
-        #Aumento la cantidad de cola
-        if estado_cancha != 'L':
-            equipos_cola.append('basquet')
-        
-    #Insertar cada fila en la tabla   
-    fila = [evento, reloj, *vector_llegada_f, *vector_llegada_h, *vector_llegada_b, estado_cancha, len(equipos_cola), *vector_ocupacion_f, *vector_ocupacion_h, *vector_ocupacion_b, fin_limpieza, fin_dia, tiempo_cola_f, cantidad_grupo_f, promedio_espera_f, tiempo_cola_h, cantidad_grupo_h, promedio_espera_h, tiempo_cola_b, cantidad_grupo_b, promedio_espera_b, tiempo_cancha_ocupado_dia, acumulador_tiempo_cancha_libre, cantidad_dias, promedio_tiempo_libre_dia, *vector_grupos] 
-    tabla.insert("", "end", values=fila)  
-    
-    
     
     
 def cargar_datos():
@@ -200,29 +124,42 @@ def cargar_datos():
     
 def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme):
     # Obtener los valores ingresados por el usuario
-    valor_tiempo_x = tiempo_x.get() # tiempo a simular
-    iteracion_i = valor_i.get()
-    hora_j = valor_j.get()
-    cantidad_cola_max = cola_max.get()
-    tiempo_limpieza = t_limpieza.get()
-    futbol_llegada_media = f_llegada_media.get()
-    handball_llegada_uniforme = [limite.get() for limite in h_llegada_uniforme]
-    basketball_llegada_uniforme = [limite.get() for limite in b_llegada_uniforme]
-    futbol_ocupacion_uniforme = [limite.get() for limite in f_ocupacion_uniforme]
-    handball_ocupacion_uniforme = [limite.get() for limite in h_ocupacion_uniforme]
-    basketball_ocupacion_uniforme = [limite.get() for limite in b_ocupacion_uniforme]
+    # valor_tiempo_x = tiempo_x.get() # tiempo a simular
+    # iteracion_i = valor_i.get()
+    # hora_j = valor_j.get()
+    # cantidad_cola_max = cola_max.get()
+    # tiempo_limpieza = t_limpieza.get()
+    # futbol_llegada_media = f_llegada_media.get()
+    # handball_llegada_uniforme = [limite.get() for limite in h_llegada_uniforme]
+    # basketball_llegada_uniforme = [limite.get() for limite in b_llegada_uniforme]
+    # futbol_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in f_ocupacion_uniforme]
+    # handball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in h_ocupacion_uniforme]
+    # basketball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in b_ocupacion_uniforme]
+
+
+    valor_tiempo_x = 80 # tiempo a simular
+    iteracion_i = 1
+    hora_j = 1
+    cantidad_cola_max = 5
+    tiempo_limpieza = 0.17
+    futbol_llegada_media = 10
+    handball_llegada_uniforme = [10, 14]
+    basketball_llegada_uniforme = [6, 10]
+    futbol_ocupacion_uniforme = [1.3333, 1.6666]
+    handball_ocupacion_uniforme = [1, 1.6666]
+    basketball_ocupacion_uniforme = [1.1666, 2.1666]
 
     # Validar las probabilidades y puntos
     valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme)
 
     #Creamos la sminulacion
-    simulacion = sim.Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, *handball_llegada_uniforme,
+    simulacion = Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, *handball_llegada_uniforme,
                                 *basketball_llegada_uniforme, *futbol_ocupacion_uniforme, *handball_ocupacion_uniforme, *basketball_ocupacion_uniforme)
     print(simulacion)
     # Mostrar resultado
     if valido:
         messagebox.showinfo("Éxito", "Datos CORRECTAMENTE cargados.")
-        simular(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme)
+        crearTabla(simulacion)
     else:
         messagebox.showerror("Error", "Datos ERRONEOS, revisar.")
 

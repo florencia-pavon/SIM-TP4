@@ -28,26 +28,6 @@ def distribucion_uniforme(reloj, li, ls):
     calculos.append(prox_llegada)
     return calculos
 
-def evento_reloj(llegada_f, llegada_h, llegada_b, ocupacion_f, ocupacion_h, ocupacion_b, fin_limpieza):
-    eventos = [llegada_f, llegada_h, llegada_b, ocupacion_f, ocupacion_h, ocupacion_b, fin_limpieza]
-    nombres_eventos = [
-        'Llegada futbol',
-        'Llegada handball',
-        'Llegada basquet',
-        'Fin futbol',
-        'Fin handball',
-        'Fin basquet',
-        'Fin limpieza'
-    ]
-    
-    # Filtrar eventos que no sean 0
-    eventos_filtrados = [e for e in eventos if e != 0]
-    tiempo_evento_proximo = min(eventos_filtrados)
-    indice_evento_proximo = eventos.index(tiempo_evento_proximo)
-    evento_proximo = nombres_eventos[indice_evento_proximo]
-    
-    return evento_proximo, tiempo_evento_proximo
-
 
 
 
