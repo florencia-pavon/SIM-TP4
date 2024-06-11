@@ -9,6 +9,7 @@ def crearTabla(simulacion):
     # Crear una ventana
     ventana_tabla = tk.Toplevel()
     ventana_tabla.title("Tabla de simulación")
+    ventana_tabla.state('zoomed')
 
     # Crear la tabla
     columnas = (
@@ -20,7 +21,7 @@ def crearTabla(simulacion):
         "Fin Limpieza", "++ Tiempo Cola Futbol", "Cant Gru Futbol",
         "Prom Espera Futbol", "++ Tiempo Cola Handball", "Cant Gru Handball",
         "Prom Espera Handball", "++ Tiempo Cola Basquet", "Cant Gru Basquet",
-        "Prom Espera Basquet", "Acum Tiempo Cancha Libre",
+        "Prom Espera Basquet", "Tiempo Cancha Libre por dia",
         "Cantidad Dias", "Prom Tiempo Libre x Dia") # "Estado Grupo", "Tipo Grupo", "Hora Grupo"
 
     tabla = ttk.Treeview(ventana_tabla, columns=columnas, show="headings")
@@ -42,12 +43,10 @@ def crearTabla(simulacion):
 
     simulacion.avanzarTiempo()
 
-    tablaActualizada = simulacion.getTabla()
-
     # Agregar la tabla a la ventana
     tabla.pack(expand=True, fill="both")
-    
-    
+
+ 
 def cargar_datos():
     # Crear una ventana
     ventana_datos = tk.Toplevel()
@@ -137,7 +136,7 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_
     # basketball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in b_ocupacion_uniforme]
 
 
-    valor_tiempo_x = 80 # tiempo a simular
+    valor_tiempo_x = 240 # tiempo a simular
     iteracion_i = 1
     hora_j = 1
     cantidad_cola_max = 5
@@ -155,7 +154,6 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_
     #Creamos la sminulacion
     simulacion = Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, *handball_llegada_uniforme,
                                 *basketball_llegada_uniforme, *futbol_ocupacion_uniforme, *handball_ocupacion_uniforme, *basketball_ocupacion_uniforme)
-    print(simulacion)
     # Mostrar resultado
     if valido:
         messagebox.showinfo("Éxito", "Datos CORRECTAMENTE cargados.")

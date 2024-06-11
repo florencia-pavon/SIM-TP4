@@ -29,8 +29,6 @@ class Grupo(ABC):
         self.tiempoFin = datosOcupacion[1]
         self.horaFin = datosOcupacion[2]
 
-        print(datosOcupacion)
-
         return datosOcupacion[2]
     
 
@@ -41,9 +39,6 @@ class Grupo(ABC):
 
     def jugando(self, reloj, limInf, limSup):
         self.estado = 'Jugando'
-        
-        # Si el grupo hizo la cola, calculamos el tiempo que estuvo
-        self.calcularTiempoEnCola(reloj)
 
         return self.calcularDuracion(reloj, limInf, limSup)
 

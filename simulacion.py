@@ -41,6 +41,7 @@ class Simulacion:
         self.basquetPorLlegar = Basquet(self.reloj, limiteInf=self.limiteInfBasCreacion, limiteSup=limiteSupBasCreacion)
         self.finOcupacion = None
         self.finLimpieza = None
+        self.finDia = 23.9999
 
 
         # acumuladores y variables necesarias
@@ -62,31 +63,26 @@ class Simulacion:
 
 
     def avanzarTiempo(self):
-        a = 0
         self.insertarFila()
         while self.reloj < self.tiempoASimular:
             
             siguienteEvento = self.getProximoEventoValido()
             
-            if a <= 5:
-                print(self.reloj)
-                print(siguienteEvento)
-            a += 1
             self.reloj = siguienteEvento
 
             if self.reloj >= self.tiempoASimular:
+                self.finSimulacion()
+                self.insertarFila()
                 break
                 
             self.manejarEvento()
-
-            self.calcularTiempoLibre()
 
             # falta agregar funcion para mostrar x iteraciones
             self.insertarFila()
     
 
     def getProximoEventoValido(self):
-        eventos = [self.futbolPorLlegar.proximaLlegada, self.handballPorLlegar.proximaLlegada, self.basquetPorLlegar.proximaLlegada, self.finOcupacion, self.finLimpieza]
+        eventos = [self.futbolPorLlegar.proximaLlegada, self.handballPorLlegar.proximaLlegada, self.basquetPorLlegar.proximaLlegada, self.finOcupacion, self.finLimpieza, self.finDia]
         eventosValidos = [evento for evento in eventos if evento is not None]
         return min(eventosValidos)
 
@@ -124,10 +120,15 @@ class Simulacion:
             self.finLimpieza = None
             # hay grupos en la cola
             if self.cola.getCantidadGrupos() > 0:
-                self.evento =  self.manejarCola()
+                self.evento =  self.manejarCola(self.reloj)
             # no hay grupos en la cola
             else:
                 self.evento = 'Fin Limpieza'
+        
+        # si termino un dia
+        elif self.reloj == self.finDia:
+            self.finalizarDia()
+        
     
 
     def llegadaGrupo(self, grupo, limInf, limSup):
@@ -171,12 +172,11 @@ class Simulacion:
         fin = self.cancha.setGrupo(grupo, self.reloj, limInf, limSup)
         self.finOcupacion = fin
         
-        if self.cancha.getGrupo() != None:
-            self.calcularTiempoEspera(self.cancha.getGrupo())
+        self.calcularTiempoEspera(self.cancha.getGrupo())
     
 
-    def manejarCola(self):
-        primerGrupo = self.cola.pasarPrimero()
+    def manejarCola(self, reloj):
+        primerGrupo = self.cola.pasarPrimero(reloj)
 
         if isinstance(primerGrupo, Futbol):
             evento = 'Ocupa Futbol'
@@ -190,6 +190,8 @@ class Simulacion:
             evento = 'Ocupa Basquet'
             self.ocuparCancha(self.basquetPorLlegar, self.limiteInfBasFin, self.limiteSupBasFin)
         
+        self.calcularTiempoEspera(primerGrupo)
+        
         return evento
     
 
@@ -202,12 +204,46 @@ class Simulacion:
             self.tiempo_cola_b += grupo.getTiempoEnCola()
     
 
+    def calcularPromedioEspera(self, acumulador, cantidadGrupos):
+        if cantidadGrupos > 0:
+            return round(acumulador / cantidadGrupos, 4)
+        else:
+            return 0
+
+    
+
     def calcularTiempoLibre(self):
-        self.cantidad_dias = (self.reloj // 24) + 1
-        self.promedio_tiempo_libre_dia = self.cancha.calcularTiempoLibre(self.reloj) /  self.cantidad_dias
+        if self.evento != 'Fin Simulacion':
+            self.cantidad_dias = int((self.reloj // 24) + 1)
+        elif self.reloj > 24:
+            self.cantidad_dias = int(self.reloj // 24)
+        else:
+            self.cantidad_dias = int((self.reloj // 24) + 1)
+
+        self.promedio_tiempo_libre_dia = self.cancha.getTimpoLibre() /  self.cantidad_dias
+    
+
+    def finalizarDia(self):
+        self.evento = 'Fin Dia'
+        self.finDia += 24
+        self.cancha.calcularTiempoLibre(self.reloj)
+        self.calcularTiempoLibre()
+    
+
+    def finSimulacion(self):
+        self.evento = 'Fin Simulacion'
+        self.reloj = self.tiempoASimular
+        self.cancha.calcularTiempoLibre(self.reloj)
+        self.calcularTiempoLibre()
+
     
 
     def insertarFila(self):
+
+        self.promedio_espera_f = self.calcularPromedioEspera(self.tiempo_cola_f, self.cantidad_grupo_f)
+        self.promedio_espera_h = self.calcularPromedioEspera(self.tiempo_cola_h, self.cantidad_grupo_h)
+        self.promedio_espera_b = self.calcularPromedioEspera(self.tiempo_cola_b, self.cantidad_grupo_b)
+
         fila = [
             self.evento, 
             self.reloj, 
@@ -218,7 +254,7 @@ class Simulacion:
             self.cola.getCantidadGrupos(),
             self.cancha.getTipoGrupo(),
             *self.cancha.getVectorOcupacion(),
-            self.finLimpieza,
+            self.finLimpieza if self.finLimpieza != None else '',
             self.tiempo_cola_f,
             self.cantidad_grupo_f,
             self.promedio_espera_f,
@@ -228,7 +264,7 @@ class Simulacion:
             self.tiempo_cola_b,
             self.cantidad_grupo_b,
             self.promedio_espera_b,
-            self.cancha.calcularTiempoLibre(self.reloj),
+            self.cancha.getTimpoLibre(),
             self.cantidad_dias,
             self.promedio_tiempo_libre_dia,
             ]
@@ -241,7 +277,3 @@ class Simulacion:
 
     def setTabla(self, tabla):
         self.tabla = tabla
-    
-
-    def getTabla(self):
-        return self.tabla

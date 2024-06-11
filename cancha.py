@@ -7,6 +7,7 @@ class Cancha:
         self.grupo = None
         self.acumTiempoJugado = 0
         self.acumTiempoLimpieza = 0
+        self.acumTiempoLibre = 0
         self.finTurno = None
     
 
@@ -47,13 +48,12 @@ class Cancha:
 
     def promedioTiempoLibre(self, reloj):
         dias = reloj // 24
-        tiempoLibre = self.calcularTiempoLibre
-        promedio = round(tiempoLibre / dias, 4)
+        promedio = round(self.acumTiempoLibre / dias, 4)
         return promedio
 
 
     def calcularTiempoLibre(self, reloj):
-        return reloj - self.acumTiempoJugado - self.acumTiempoLimpieza
+        self.acumTiempoLibre = reloj - self.acumTiempoJugado - self.acumTiempoLimpieza
         
     
     def getTipoGrupo(self):
@@ -73,4 +73,8 @@ class Cancha:
             return ['', '', '']
         else:
             return self.grupo.getVectorOcupacion()
+    
+
+    def getTimpoLibre(self):
+        return self.acumTiempoLibre
         

@@ -16,11 +16,6 @@ class Cola:
             self.grupos.sort(key=prioridad)
 
 
-    def eliminarGrupo(self):
-        if self.grupos:
-            return self.grupos.pop(0)
-        return None
-
     def agregarGrupo(self, grupo, reloj):
         self.grupos.append(grupo)
         self.ordenarGrupo()
@@ -33,8 +28,11 @@ class Cola:
         return len(self.grupos)
 
 
-    def pasarPrimero(self):
+    def pasarPrimero(self, reloj):
         primero = self.grupos[0]
+        
+        # Si el grupo hizo la cola, calculamos el tiempo que estuvo
+        primero.calcularTiempoEnCola(reloj)
         self.grupos.pop(0)
 
         return primero
