@@ -135,30 +135,30 @@ def cargar_datos():
     
 def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme):
     # # Obtener los valores ingresados por el usuario
-    # valor_tiempo_x = tiempo_x.get() # tiempo a simular
-    # iteracion_i = valor_i.get()
-    # hora_j = valor_j.get()
-    # cantidad_cola_max = cola_max.get()
-    # tiempo_limpieza = round(t_limpieza.get() / 60, 4)
-    # futbol_llegada_media = f_llegada_media.get()
-    # handball_llegada_uniforme = [limite.get() for limite in h_llegada_uniforme]
-    # basketball_llegada_uniforme = [limite.get() for limite in b_llegada_uniforme]
-    # futbol_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in f_ocupacion_uniforme]
-    # handball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in h_ocupacion_uniforme]
-    # basketball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in b_ocupacion_uniforme]
+    valor_tiempo_x = tiempo_x.get() # tiempo a simular
+    iteracion_i = valor_i.get()
+    hora_j = valor_j.get()
+    cantidad_cola_max = cola_max.get()
+    tiempo_limpieza = round(t_limpieza.get() / 60, 4)
+    futbol_llegada_media = f_llegada_media.get()
+    handball_llegada_uniforme = [limite.get() for limite in h_llegada_uniforme]
+    basketball_llegada_uniforme = [limite.get() for limite in b_llegada_uniforme]
+    futbol_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in f_ocupacion_uniforme]
+    handball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in h_ocupacion_uniforme]
+    basketball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in b_ocupacion_uniforme]
 
 
-    valor_tiempo_x = 23 # tiempo a simular
-    iteracion_i = 10000
-    hora_j = 0
-    cantidad_cola_max = 5
-    tiempo_limpieza = 0.17
-    futbol_llegada_media = 10
-    handball_llegada_uniforme = [10, 14]
-    basketball_llegada_uniforme = [6, 10]
-    futbol_ocupacion_uniforme = [1.3333, 1.6666]
-    handball_ocupacion_uniforme = [1, 1.6666]
-    basketball_ocupacion_uniforme = [1.1666, 2.1666]
+    # valor_tiempo_x = 240 # tiempo a simular
+    # iteracion_i = 10000
+    # hora_j = 0
+    # cantidad_cola_max = 5
+    # tiempo_limpieza = 3
+    # futbol_llegada_media = 10
+    # handball_llegada_uniforme = [10, 14]
+    # basketball_llegada_uniforme = [6, 10]
+    # futbol_ocupacion_uniforme = [1.3333, 1.6666]
+    # handball_ocupacion_uniforme = [1, 1.6666]
+    # basketball_ocupacion_uniforme = [1.1666, 2.1666]
 
     # Validar las probabilidades y puntos
     valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme)

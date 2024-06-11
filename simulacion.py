@@ -29,7 +29,7 @@ class Simulacion:
 
         # atributos para el fin de los Equipos
         self.limiteInfFutFin = limiteInfFutFin
-        self.limiteSupFutdFin = limiteSupFutFin
+        self.limiteSupFutFin = limiteSupFutFin
         self.limiteInfHandFin = limiteInfHandFin
         self.limiteSupHandFin = limiteSupHandFin
         self.limiteInfBasFin = limiteInfBasFin
@@ -82,15 +82,11 @@ class Simulacion:
                 self.insertarFila()
                 break
                 
-            # falta agregar funcion para mostrar x iteraciones
             if self.reloj == self.eventoHoraJ:
                 self.evento = 'Hora Ingresada por Usuario: ' + self.evento
                 self.insertarFila()
             
             self.manejarEvento()
-
-            
-            
 
             
             if self.reloj > self.horaJ and iteraciones < self.iteraciones:
@@ -112,7 +108,7 @@ class Simulacion:
         # Si llego un equipo de Futbol
         if self.reloj == self.futbolPorLlegar.proximaLlegada:
             self.evento = 'Llegada Futbol'
-            self.llegadaGrupo(self.futbolPorLlegar, self.limiteInfFutFin, self.limiteSupFutdFin)
+            self.llegadaGrupo(self.futbolPorLlegar, self.limiteInfFutFin, self.limiteSupFutFin, 'Futbol')
             # creo otro futbol por llegar
             nombre = 'Futbol ' + str(self.cantidad_grupo_f + 1)
             self.futbolPorLlegar = Futbol(self.reloj, nombre=nombre, media=self.mediaFutbolCreacion)
@@ -120,7 +116,7 @@ class Simulacion:
         # Si llego un equipo de Handball
         elif self.reloj == self.handballPorLlegar.proximaLlegada:
             self.evento = 'Llegada Handball'
-            self.llegadaGrupo(self.handballPorLlegar, self.limiteInfHandFin, self.limiteSupHandFin)
+            self.llegadaGrupo(self.handballPorLlegar, self.limiteInfHandFin, self.limiteSupHandFin, 'Handball')
             # creo otro handball por llegar
             nombre = 'Handball ' + str(self.cantidad_grupo_h + 1)
             self.handballPorLlegar = Handball(self.reloj, nombre=nombre, limiteInf=self.limiteInfHandCreacion, limiteSup=self.limiteSupHandCreacion) 
@@ -128,7 +124,7 @@ class Simulacion:
         # Si llego un equipo de Basquet
         elif self.reloj == self.basquetPorLlegar.proximaLlegada:
             self.evento = 'Llegada Basquet'
-            self.llegadaGrupo(self.basquetPorLlegar, self.limiteInfBasFin, self.limiteSupBasFin)
+            self.llegadaGrupo(self.basquetPorLlegar, self.limiteInfBasFin, self.limiteSupBasFin, 'Basquet')
             # creo otro basquet por llegar
             nombre = 'Basquet ' + str(self.cantidad_grupo_b + 1)
             self.basquetPorLlegar = Basquet(self.reloj, nombre=nombre, limiteInf=self.limiteInfBasCreacion, limiteSup=self.limiteSupBasCreacion) 
@@ -210,16 +206,16 @@ class Simulacion:
         primerGrupo = self.cola.pasarPrimero(reloj)
 
         if isinstance(primerGrupo, Futbol):
-            evento = 'Ocupa Futbol'
-            self.ocuparCancha(self.futbolPorLlegar, self.limiteInfFutFin, self.limiteSupFutdFin)
+            evento = 'Fin Limpieza y Ocupa Futbol'
+            self.ocuparCancha(primerGrupo, self.limiteInfFutFin, self.limiteSupFutFin)
 
         elif isinstance(primerGrupo, Handball):
-            evento = 'Ocupa Handball'
-            self.ocuparCancha(self.handballPorLlegar, self.limiteInfHandFin, self.limiteSupHandFin)
+            evento = 'Fin Limpieza y Ocupa Handball'
+            self.ocuparCancha(primerGrupo, self.limiteInfHandFin, self.limiteSupHandFin)
 
         elif isinstance(primerGrupo, Basquet):
-            evento = 'Ocupa Basquet'
-            self.ocuparCancha(self.basquetPorLlegar, self.limiteInfBasFin, self.limiteSupBasFin)
+            evento = 'Fin Limpieza y Ocupa Basquet'
+            self.ocuparCancha(primerGrupo, self.limiteInfBasFin, self.limiteSupBasFin)
         
         self.calcularTiempoEspera(primerGrupo)
         
@@ -251,7 +247,7 @@ class Simulacion:
         else:
             self.cantidad_dias = int((self.reloj // 24) + 1)
 
-        self.promedio_tiempo_libre_dia = self.cancha.getTimpoLibre() /  self.cantidad_dias
+        self.promedio_tiempo_libre_dia = self.cancha.getTiempoLibre() /  self.cantidad_dias
     
 
     def finalizarDia(self):
@@ -275,7 +271,6 @@ class Simulacion:
         info += self.cancha.getDatosGrupo()
         
         return info
-
     
 
     def insertarFila(self):
@@ -306,7 +301,7 @@ class Simulacion:
             self.tiempo_cola_b,
             self.cantidad_grupo_b,
             self.promedio_espera_b,
-            self.cancha.getTimpoLibre(),
+            self.cancha.getTiempoLibre(),
             self.cantidad_dias,
             self.promedio_tiempo_libre_dia,
             grupos

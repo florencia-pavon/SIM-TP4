@@ -8,6 +8,7 @@ class Cancha:
         self.acumTiempoJugado = 0
         self.acumTiempoLimpieza = 0
         self.acumTiempoLibre = 0
+        self.inicioTurno = None
         self.finTurno = None
     
 
@@ -29,14 +30,15 @@ class Cancha:
         
         # Marcamos  en estado 'Jugando'
         horaFinTurno = grupo.jugando(reloj, limInf, limSup)
-        self.tiempoJugado = horaFinTurno - reloj
+        self.inicioTurno = reloj
+        self.finTurno = horaFinTurno
 
         return horaFinTurno
     
 
     def terminarTurno(self):
         self.estado = 'En Limpieza' # Marcamos en limpieza la Cancha
-        self.acumTiempoJugado += self.tiempoJugado
+        self.acumTiempoJugado += (self.finTurno - self.inicioTurno)
         del self.grupo
         self.grupo = None
     
@@ -57,15 +59,10 @@ class Cancha:
         
     
     def getTipoGrupo(self):
-        if self.grupo == None:
+        if self.grupo is None:
             return ''
         else:
-            if isinstance(self.grupo, Futbol):
-                return 'Futbol'
-            elif isinstance(self.grupo, Handball):
-                return 'Handball'
-            elif isinstance(self.grupo, Basquet):
-                return 'Basquet'
+            return self.grupo.__class__.__name__
         
     
     def getVectorOcupacion(self):
@@ -75,7 +72,7 @@ class Cancha:
             return self.grupo.getVectorOcupacion()
     
 
-    def getTimpoLibre(self):
+    def getTiempoLibre(self):
         return self.acumTiempoLibre
 
 

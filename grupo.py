@@ -48,7 +48,7 @@ class Grupo(ABC):
 
     def calcularTiempoEnCola(self, reloj):
         if self.horaLlegaCola != None:
-            self.tiempoEnCola = reloj - self.horaLlegaCola
+            self.tiempoEnCola = round(reloj - self.horaLlegaCola, 4)
 
     
     def getTiempoEnCola(self):
