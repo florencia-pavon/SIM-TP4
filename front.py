@@ -11,7 +11,7 @@ def crearTabla(simulacion):
     ventana_tabla.title("Tabla de simulación")
     ventana_tabla.state('zoomed')
 
-    # Crear la tabla
+    # Definir las columnas de la tabla
     columnas = (
         "Evento", "Reloj", "Rnd Llegada Futbol", "Tiempo Llegada Futbol",
         "Proxima Llegada Futbol", "Rnd Llegada Handball", "Tiempo Llegada Handball",
@@ -22,21 +22,33 @@ def crearTabla(simulacion):
         "Prom Espera Futbol", "++ Tiempo Cola Handball", "Cant Gru Handball",
         "Prom Espera Handball", "++ Tiempo Cola Basquet", "Cant Gru Basquet",
         "Prom Espera Basquet", "Tiempo Cancha Libre por dia",
-        "Cantidad Dias", "Prom Tiempo Libre x Dia") # "Estado Grupo", "Tipo Grupo", "Hora Grupo"
+        "Cantidad Dias", "Prom Tiempo Libre x Dia", "Grupos")
 
+    # Crear la tabla
     tabla = ttk.Treeview(ventana_tabla, columns=columnas, show="headings")
 
-    # Configurar encabezados de columnas con alineación centrada
+    # Configurar encabezados de columnas con alineación centrada, excepto la última columna
     for col in columnas:
-        tabla.heading(col, text=col, anchor="center")
-        tabla.column(col, anchor="center")
-        
+        if col == "Grupos":
+            tabla.heading(col, text=col, anchor="w")
+            tabla.column(col, anchor="w", width=10000)
+        elif col == "Evento" :
+            tabla.heading(col, text=col, anchor="w")
+            tabla.column(col, anchor="w", width=300)
+        else:
+            tabla.heading(col, text=col, anchor="center")
+            tabla.column(col, anchor="center")
+
     # Crear scrollbar horizontal
     scrollbar_horizontal = tk.Scrollbar(ventana_tabla, orient="horizontal", command=tabla.xview)
     scrollbar_horizontal.pack(fill="x", side="bottom")
 
-    # Asociar la scrollbar con la tabla
-    tabla.configure(xscrollcommand=scrollbar_horizontal.set)
+    # Crear scrollbar vertical
+    scrollbar_vertical = tk.Scrollbar(ventana_tabla, orient="vertical", command=tabla.yview)
+    scrollbar_vertical.pack(fill="y", side="right")
+
+    # Asociar las scrollbars con la tabla
+    tabla.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
 
     # le mandamos la tabla a la simulacion
     simulacion.setTabla(tabla)
@@ -78,7 +90,7 @@ def cargar_datos():
     tk.Label(ventana_datos, text="Cola maxima").grid(row=14, column=0)
     tk.Entry(ventana_datos, textvariable=cola_max).grid(row=14, column=1)
     #Etiquetas para el tiempo que se demora en limpiar la cancha
-    tk.Label(ventana_datos, text="Duracion de limpieza").grid(row=15, column=0)
+    tk.Label(ventana_datos, text="Duracion de limpieza (En Minutos)").grid(row=15, column=0)
     tk.Entry(ventana_datos, textvariable=t_limpieza).grid(row=15, column=1)
     #Etiquetas para las llegadas y ocupaciones de cancha
     tk.Label(ventana_datos, text="").grid(row=9, column=0)
@@ -122,12 +134,12 @@ def cargar_datos():
     boton_validar.grid(row=50, column=7, pady=10)
     
 def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme):
-    # Obtener los valores ingresados por el usuario
+    # # Obtener los valores ingresados por el usuario
     # valor_tiempo_x = tiempo_x.get() # tiempo a simular
     # iteracion_i = valor_i.get()
     # hora_j = valor_j.get()
     # cantidad_cola_max = cola_max.get()
-    # tiempo_limpieza = t_limpieza.get()
+    # tiempo_limpieza = round(t_limpieza.get() / 60, 4)
     # futbol_llegada_media = f_llegada_media.get()
     # handball_llegada_uniforme = [limite.get() for limite in h_llegada_uniforme]
     # basketball_llegada_uniforme = [limite.get() for limite in b_llegada_uniforme]
@@ -136,9 +148,9 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_
     # basketball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in b_ocupacion_uniforme]
 
 
-    valor_tiempo_x = 240 # tiempo a simular
-    iteracion_i = 1
-    hora_j = 1
+    valor_tiempo_x = 23 # tiempo a simular
+    iteracion_i = 10000
+    hora_j = 0
     cantidad_cola_max = 5
     tiempo_limpieza = 0.17
     futbol_llegada_media = 10

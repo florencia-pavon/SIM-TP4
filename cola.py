@@ -36,3 +36,11 @@ class Cola:
         self.grupos.pop(0)
 
         return primero
+    
+    def mostrarDatosGrupos(self):
+        info = ''
+        if self.getCantidadGrupos() > 0:
+            info += 'Grupos en cola: '
+            for grupo in self.grupos:
+                info += grupo.mostrarDatos()
+        return info

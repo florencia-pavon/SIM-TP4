@@ -77,4 +77,13 @@ class Cancha:
 
     def getTimpoLibre(self):
         return self.acumTiempoLibre
+
+
+    def getDatosGrupo(self):
+        info = ''
+        if self.grupo != None:
+            info += 'Grupo en Cancha: '
+            info += self.grupo.mostrarDatos()
+        
+        return info
         

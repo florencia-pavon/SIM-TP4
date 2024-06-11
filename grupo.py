@@ -2,8 +2,9 @@ from back import *
 from abc import ABC, abstractmethod
 
 class Grupo(ABC):
-    def __init__(self, reloj, media=None, limiteInf=None, limiteSup=None):
+    def __init__(self, reloj,  nombre, media=None, limiteInf=None, limiteSup=None):
         self.reloj = reloj
+        self.nombre = nombre
         self.estado = 'Por Llegar'
         self.media = media
         self.limiteInf = limiteInf
@@ -16,6 +17,7 @@ class Grupo(ABC):
         self.horaFin = None
         self.horaLlegaCola = None
         self.tiempoEnCola = 0
+        self.comienzaJugar = None
         self.initialize()
 
     @abstractmethod
@@ -24,6 +26,7 @@ class Grupo(ABC):
 
     
     def calcularDuracion(self, reloj, limiteInf, limiteSup):
+        self.comienzaJugar = reloj
         datosOcupacion = distribucion_uniforme(reloj, limiteInf, limiteSup)
         self.rndFin = datosOcupacion[0]
         self.tiempoFin = datosOcupacion[1]
@@ -58,6 +61,27 @@ class Grupo(ABC):
 
     def getVectorOcupacion(self):
         return [self.rndFin, self.tiempoFin, self.horaFin]
+
+
+    def mostrarDatos(self):
+        partes = [f'| {self.nombre}']
+        partes.append(f'Estado: {self.estado}')
+        partes.append(f'Llegada: {self.proximaLlegada}')
+        partes.append(f'Tiempo en Cola: {self.tiempoEnCola}')
+        
+        if self.comienzaJugar is not None:
+            partes.append(f'Comienza Turno: {round(self.comienzaJugar, 4)}')
+        if self.horaFin is not None:
+            partes.append(f'Finaliza Turno: {self.horaFin}')
+        
+        partes.append('|')
+        
+        info = ', '.join(partes)
+        return info
+
+
+
+
 
 
 class Futbol(Grupo):
