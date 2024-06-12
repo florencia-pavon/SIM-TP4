@@ -90,7 +90,7 @@ def cargar_datos():
     tk.Label(ventana_datos, text="Cola maxima").grid(row=14, column=0)
     tk.Entry(ventana_datos, textvariable=cola_max).grid(row=14, column=1)
     #Etiquetas para el tiempo que se demora en limpiar la cancha
-    tk.Label(ventana_datos, text="Duracion de limpieza (En Minutos)").grid(row=15, column=0)
+    tk.Label(ventana_datos, text="Duracion de limpieza (min)").grid(row=15, column=0)
     tk.Entry(ventana_datos, textvariable=t_limpieza).grid(row=15, column=1)
     #Etiquetas para las llegadas y ocupaciones de cancha
     tk.Label(ventana_datos, text="").grid(row=9, column=0)
@@ -101,7 +101,7 @@ def cargar_datos():
     tk.Label(ventana_datos, text="Futbol").grid(row=6, column=0)
     tk.Label(ventana_datos, text="Handball").grid(row=7, column=0)
     tk.Label(ventana_datos, text="Basketball").grid(row=8, column=0)
-    tk.Label(ventana_datos, text="Llegadas (en horas)").grid(row=5, column=1)
+    tk.Label(ventana_datos, text="Llegadas (hs)").grid(row=5, column=1)
     tk.Label(ventana_datos, text="Exponencial").grid(row=6, column=1)
     tk.Label(ventana_datos, text="Uniforme").grid(row=7, column=1)
     tk.Label(ventana_datos, text="Uniforme").grid(row=8, column=1)
@@ -113,7 +113,7 @@ def cargar_datos():
     tk.Entry(ventana_datos, textvariable=h_llegada_uniforme[1]).grid(row=7, column=4)
     tk.Entry(ventana_datos, textvariable=b_llegada_uniforme[0]).grid(row=8, column=3)
     tk.Entry(ventana_datos, textvariable=b_llegada_uniforme[1]).grid(row=8, column=4)
-    tk.Label(ventana_datos, text="Ocupacion de cancha (en minutos)").grid(row=5, column=5)
+    tk.Label(ventana_datos, text="Ocupacion de cancha (min)").grid(row=5, column=5)
     tk.Label(ventana_datos, text="Li").grid(row=5, column=6)
     tk.Label(ventana_datos, text="Ls").grid(row=5, column=7)
     tk.Label(ventana_datos, text="Uniforme").grid(row=6, column=5)
