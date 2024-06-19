@@ -8,7 +8,7 @@ import tkinter.messagebox as messagebox
 
 class Simulacion:
     def __init__(self, tiempoASimular, iteraciones, horaJ, colaMax, limpieza, mediaFutbolCreacion, limiteInfHandCreacion, limiteSupHandCreacion, limiteInfBasCreacion, limiteSupBasCreacion,
-                 limiteInfFutFin, limiteSupFutFin, limiteInfHandFin, limiteSupHandFin, limiteInfBasFin, limiteSupBasFin):
+                 limiteInfFutFin, limiteSupFutFin, limiteInfHandFin, limiteSupHandFin, limiteInfBasFin, limiteSupBasFin, dFutbol, dBasquet, dHandball):
         self.tiempoASimular = tiempoASimular
         self.horaJ = horaJ
         self.iteraciones = iteraciones
@@ -20,6 +20,11 @@ class Simulacion:
         self.cancha = Cancha('Libre')
         self.tabla = None
 
+        #Atributos para las ecuaciones
+        self.dFutbol = dFutbol
+        self.dBasquet = dBasquet
+        self.dHandball = dHandball
+        
         # atributos para la creacion de Equipos
         self.mediaFutbolCreacion = mediaFutbolCreacion
         self.limiteInfHandCreacion = limiteInfHandCreacion
