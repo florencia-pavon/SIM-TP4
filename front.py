@@ -55,6 +55,7 @@ def crearTabla(simulacion):
 
     simulacion.avanzarTiempo()
 
+
     # Agregar la tabla a la ventana
     tabla.pack(expand=True, fill="both")
 
@@ -69,7 +70,6 @@ def cargar_datos():
     valor_i = tk.IntVar()
     valor_j = tk.DoubleVar()
     cola_max = tk.IntVar()
-    t_limpieza = tk.DoubleVar()
     f_llegada_media = tk.DoubleVar()
     h_llegada_uniforme = [tk.DoubleVar() for _ in range(2)]
     b_llegada_uniforme = [tk.DoubleVar() for _ in range(2)]
@@ -102,9 +102,6 @@ def cargar_datos():
     #Etiquetas para variable Cola Maxima
     tk.Label(ventana_datos, text="Cola maxima").grid(row=14, column=0)
     tk.Entry(ventana_datos, textvariable=cola_max).grid(row=14, column=1)
-    #Etiquetas para el tiempo que se demora en limpiar la cancha
-    tk.Label(ventana_datos, text="Duracion de limpieza (min)").grid(row=15, column=0)
-    tk.Entry(ventana_datos, textvariable=t_limpieza).grid(row=15, column=1)
     #Etiquetas para las llegadas y ocupaciones de cancha
     tk.Label(ventana_datos, text="").grid(row=9, column=0)
     tk.Label(ventana_datos, text="").grid(row=9, column=1)
@@ -143,16 +140,15 @@ def cargar_datos():
 
     
     # Botón para validar las probabilidades
-    boton_validar = tk.Button(ventana_datos, text="Validar", command=lambda: validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme, d_futbol, d_basquet, d_handball))
+    boton_validar = tk.Button(ventana_datos, text="Validar", command=lambda: validar_ingreso(tiempo_x, valor_i, valor_j, cola_max,f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme, d_futbol, d_basquet, d_handball))
     boton_validar.grid(row=50, column=7, pady=10)
     
-def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme, d_futbol, d_basquet, d_handball):
+def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme, d_futbol, d_basquet, d_handball):
     # # Obtener los valores ingresados por el usuario
     # valor_tiempo_x = tiempo_x.get() # tiempo a simular
     # iteracion_i = valor_i.get()
     # hora_j = valor_j.get()
     # cantidad_cola_max = cola_max.get()
-    # tiempo_limpieza = round(t_limpieza.get() / 60, 4)
     # futbol_llegada_media = f_llegada_media.get()
     # handball_llegada_uniforme = [limite.get() for limite in h_llegada_uniforme]
     # basketball_llegada_uniforme = [limite.get() for limite in b_llegada_uniforme]
@@ -168,7 +164,6 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_
     iteracion_i = 10000
     hora_j = 0
     cantidad_cola_max = 5
-    tiempo_limpieza = 3
     futbol_llegada_media = 10
     handball_llegada_uniforme = [10, 14]
     basketball_llegada_uniforme = [6, 10]
@@ -181,10 +176,10 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, t_limpieza, f_llegada_
     
 
     # Validar las probabilidades y puntos
-    valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme, d_f, d_b, d_h)
+    valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme, d_f, d_b, d_h)
 
     #Creamos la sminulacion
-    simulacion = Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, tiempo_limpieza, futbol_llegada_media, *handball_llegada_uniforme,
+    simulacion = Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, *handball_llegada_uniforme,
                                 *basketball_llegada_uniforme, *futbol_ocupacion_uniforme, *handball_ocupacion_uniforme, *basketball_ocupacion_uniforme, d_f, d_b, d_h)
     # Mostrar resultado
     if valido:
