@@ -5,10 +5,11 @@ from cancha import Cancha
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as messagebox
+import random
 
 class Simulacion:
     def __init__(self, tiempoASimular, iteraciones, horaJ, colaMax, mediaFutbolCreacion, limiteInfHandCreacion, limiteSupHandCreacion, limiteInfBasCreacion, limiteSupBasCreacion,
-                 limiteInfFutFin, limiteSupFutFin, limiteInfHandFin, limiteSupHandFin, limiteInfBasFin, limiteSupBasFin, dFutbol, dBasquet, dHandball):
+                 limiteInfFutFin, limiteSupFutFin, limiteInfHandFin, limiteSupHandFin, limiteInfBasFin, limiteSupBasFin):
         self.tiempoASimular = tiempoASimular
         self.horaJ = horaJ
         self.iteraciones = iteraciones
@@ -19,12 +20,6 @@ class Simulacion:
         self.cola = Cola()
         self.cancha = Cancha('Libre')
         self.tabla = None
-        self.acumuladorLimpiezas = 0
-
-        #Atributos para las ecuaciones
-        self.dFutbol = dFutbol
-        self.dBasquet = dBasquet
-        self.dHandball = dHandball
         
         # atributos para la creacion de Equipos
         self.mediaFutbolCreacion = mediaFutbolCreacion
@@ -65,21 +60,21 @@ class Simulacion:
         self.promedio_tiempo_libre_dia = 0
     
 
-    def runge_kutta(self, Dcorte, C):
+    def runge_kutta(self):
         h = 0.1
-        d = 0
+        m = 0
         t = 0
+        Mcorte = random.uniform(2000,20000)
         
-        while d <= Dcorte:
-            k1 = 0.6*C + t
-            
-            k2 = 0.6*C + (t+(h/2))
-            k3 = k2
-            k4 = 0.6*C + (t+h)
-            d = d + (h/6) *(k1+2*k2+2*k3+k4)
+        while m <= Mcorte:
+            k1 = 3*t**2+0.5*m
+            k2 = 3*(t+h/2)**2+0.5*(m+h/2*k1)
+            k3 = 3*(t+h/2)**2+0.5*(m+h/2*k2)
+            k4 = 3*(t+h)**2+0.5*(m+h*k3)
+            m = m + (h/6) *(k1+2*k2+2*k3+k4)
             t += h
             
-        return round(t/60,2)
+        return round((t/0.1/60),2)
     
     def setFinOcupacion(self, hora):
         self.finOcupacion = hora
@@ -155,11 +150,10 @@ class Simulacion:
         elif self.reloj == self.finOcupacion:
             self.evento = 'Comienza Limpieza'
             grupo = self.cancha.grupo
-            self.terminarTurno(grupo)
+            self.terminarTurno()
         
         # si termino la limpieza de la cancha
         elif self.reloj == self.finLimpieza:
-            self.acumuladorLimpiezas += 1
             self.cancha.liberar(self.limpieza)
             self.finLimpieza = None
             # hay grupos en la cola
@@ -190,18 +184,10 @@ class Simulacion:
                 self.evento = 'Llega ' + tipo + ' y Juega'
     
 
-    def terminarTurno(self, grupo):
-        
-        if isinstance(grupo, Futbol):
-            demora_limpieza = self.runge_kutta(self.dFutbol, self.acumuladorLimpiezas)
-        elif isinstance(grupo, Handball):
-            demora_limpieza = self.runge_kutta(self.dHandball, self.acumuladorLimpiezas)
-        elif isinstance(grupo, Basquet):
-            demora_limpieza = self.runge_kutta(self.dBasquet, self.acumuladorLimpiezas)
+    def terminarTurno(self):
+        demora_limpieza = self.runge_kutta()
         self.limpieza = demora_limpieza
         self.cancha.terminarTurno()
-        
-        
         self.finLimpieza = self.reloj + demora_limpieza # Seteo el fin de limpieza
         self.finOcupacion = None
 
