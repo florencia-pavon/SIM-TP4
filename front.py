@@ -18,7 +18,7 @@ def crearTabla(simulacion):
         "Proxima Llegada Handball", "Rnd Llegada Basquet", "Tiempo Llegada Basquet",
         "Proxima Llegada Basquet", "Estado Cancha", "Cola Cancha", "Tipo Equipo en Ocupacion",
         "Rnd Ocupacion", "Tiempo Ocupacion", "Hora Fin Ocupacion",
-        "Fin Limpieza", "++ Tiempo Cola Futbol", "Cant Gru Futbol",
+        'M','Duracion Limpieza ',"Fin Limpieza", "++ Tiempo Cola Futbol", "Cant Gru Futbol",
         "Prom Espera Futbol", "++ Tiempo Cola Handball", "Cant Gru Handball",
         "Prom Espera Handball", "++ Tiempo Cola Basquet", "Cant Gru Basquet",
         "Prom Espera Basquet", "Tiempo Cancha Libre por dia",
@@ -76,6 +76,11 @@ def cargar_datos():
     f_ocupacion_uniforme = [tk.DoubleVar() for _ in range(2)]
     h_ocupacion_uniforme = [tk.DoubleVar() for _ in range(2)]
     b_ocupacion_uniforme = [tk.DoubleVar() for _ in range(2)]
+    h = tk.DoubleVar()
+    coeficiente_t = tk.DoubleVar()
+    coeficiente_M = tk.DoubleVar()
+    limites_M = [tk.DoubleVar() for _ in range(2)]
+    
     
 
     #Etiquetas para variable X tiempo total de simulacion
@@ -90,6 +95,20 @@ def cargar_datos():
     #Etiquetas para variable Cola Maxima
     tk.Label(ventana_datos, text="Cola maxima").grid(row=14, column=0)
     tk.Entry(ventana_datos, textvariable=cola_max).grid(row=14, column=1)
+    #Etiquetas para h
+    tk.Label(ventana_datos, text="h").grid(row=15, column=0)
+    tk.Entry(ventana_datos, textvariable=h).grid(row=15, column=1)
+    #Etiquetas para coeficientes
+    tk.Label(ventana_datos, text="Coeficiente t").grid(row=16, column=0)
+    tk.Entry(ventana_datos, textvariable=coeficiente_t).grid(row=16, column=1)
+    tk.Label(ventana_datos, text="Coeficiente M").grid(row=17, column=0)
+    tk.Entry(ventana_datos, textvariable=coeficiente_M).grid(row=17, column=1)
+    #Etiquetas para limite superior e inferior
+    tk.Label(ventana_datos, text="Limite inferior M").grid(row=18, column=0)
+    tk.Entry(ventana_datos, textvariable=limites_M[0]).grid(row=18, column=1)
+    tk.Label(ventana_datos, text="Limite Superior M").grid(row=19, column=0)
+    tk.Entry(ventana_datos, textvariable=limites_M[1]).grid(row=19, column=1)
+    
     #Etiquetas para las llegadas y ocupaciones de cancha
     tk.Label(ventana_datos, text="").grid(row=9, column=0)
     tk.Label(ventana_datos, text="").grid(row=9, column=1)
@@ -124,14 +143,13 @@ def cargar_datos():
     tk.Entry(ventana_datos, textvariable=b_ocupacion_uniforme[0]).grid(row=8, column=6)
     tk.Entry(ventana_datos, textvariable=b_ocupacion_uniforme[1]).grid(row=8, column=7)
 
-    
 
     
     # Botón para validar las probabilidades
-    boton_validar = tk.Button(ventana_datos, text="Validar", command=lambda: validar_ingreso(tiempo_x, valor_i, valor_j, cola_max,f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme))
+    boton_validar = tk.Button(ventana_datos, text="Validar", command=lambda: validar_ingreso(tiempo_x, valor_i, valor_j, cola_max,f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme, h, coeficiente_t, coeficiente_M, limites_M))
     boton_validar.grid(row=50, column=7, pady=10)
     
-def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme):
+def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, f_llegada_media, h_llegada_uniforme, b_llegada_uniforme, f_ocupacion_uniforme, h_ocupacion_uniforme, b_ocupacion_uniforme, h, coeficiente_t, coeficiente_M, limites_M):
     # # Obtener los valores ingresados por el usuario
     # valor_tiempo_x = tiempo_x.get() # tiempo a simular
     # iteracion_i = valor_i.get()
@@ -143,9 +161,13 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, f_llegada_media, h_lle
     # futbol_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in f_ocupacion_uniforme]
     # handball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in h_ocupacion_uniforme]
     # basketball_ocupacion_uniforme = [round(limite.get() / 60, 4) for limite in b_ocupacion_uniforme]
+    # valor_h = h.get()
+    # coef_t = coeficiente_t.get()
+    # coef_M = coeficiente_M.get()
+    # lim_M = [limite.get() for limite in limites_M]
 
-    valor_tiempo_x = 240 # tiempo a simular
-    iteracion_i = 10000
+    valor_tiempo_x = 24 # tiempo a simular
+    iteracion_i = 100
     hora_j = 0
     cantidad_cola_max = 5
     futbol_llegada_media = 10
@@ -154,14 +176,18 @@ def validar_ingreso(tiempo_x, valor_i, valor_j, cola_max, f_llegada_media, h_lle
     futbol_ocupacion_uniforme = [1.3333, 1.6666]
     handball_ocupacion_uniforme = [1, 1.6666]
     basketball_ocupacion_uniforme = [1.1666, 2.1666]
+    valor_h = 0.1
+    coef_t = 3
+    coef_M = 0.5
+    lim_M = [2000, 20000]
     
 
     # Validar las probabilidades y puntos
-    valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme)
+    valido = validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme, valor_h, coef_t, coef_M, lim_M)
 
     #Creamos la sminulacion
     simulacion = Simulacion(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, *handball_llegada_uniforme,
-                                *basketball_llegada_uniforme, *futbol_ocupacion_uniforme, *handball_ocupacion_uniforme, *basketball_ocupacion_uniforme)
+                                *basketball_llegada_uniforme, *futbol_ocupacion_uniforme, *handball_ocupacion_uniforme, *basketball_ocupacion_uniforme, valor_h, coef_t, coef_M, lim_M)
     # Mostrar resultado
     if valido:
         messagebox.showinfo("Éxito", "Datos CORRECTAMENTE cargados.")

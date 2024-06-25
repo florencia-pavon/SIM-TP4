@@ -9,17 +9,26 @@ import random
 
 class Simulacion:
     def __init__(self, tiempoASimular, iteraciones, horaJ, colaMax, mediaFutbolCreacion, limiteInfHandCreacion, limiteSupHandCreacion, limiteInfBasCreacion, limiteSupBasCreacion,
-                 limiteInfFutFin, limiteSupFutFin, limiteInfHandFin, limiteSupHandFin, limiteInfBasFin, limiteSupBasFin):
+                 limiteInfFutFin, limiteSupFutFin, limiteInfHandFin, limiteSupHandFin, limiteInfBasFin, limiteSupBasFin, h, coef_t, coef_M, lim_M):
         self.tiempoASimular = tiempoASimular
         self.horaJ = horaJ
         self.iteraciones = iteraciones
         self.colaMax = colaMax
-        self.limpieza = None
+        self.limpieza = ' '
         self.reloj = 0
         self.evento = 'Inicial'
         self.cola = Cola()
         self.cancha = Cancha('Libre')
         self.tabla = None
+        self.acumuladorLimpieza = 1
+        self.M = ' '
+        self.h = h
+        self.coeficienteT = coef_t
+        self.coeficienteM = coef_M
+        self.limiteInferiorM = lim_M[0]
+        self.limiteSuperiorM = lim_M[1]
+        
+      
         
         # atributos para la creacion de Equipos
         self.mediaFutbolCreacion = mediaFutbolCreacion
@@ -60,19 +69,54 @@ class Simulacion:
         self.promedio_tiempo_libre_dia = 0
     
 
-    def runge_kutta(self):
-        h = 0.1
+    def runge_kutta(self, acumuladorLimpieza):
+        # Crear una ventana
+        ventana_runge = tk.Toplevel()
+        ventana_runge.title(f'Tabla Runge Limpieza Nro {acumuladorLimpieza}')
+        
+        # Definir las columnas de la tabla
+        columnas_runge = ('t', 'M', 'K1', 'K2', 'K3', 'K4', 't (i+1)', 'M (i+1)')
+
+        # Crear la tabla
+        tabla_runge = ttk.Treeview(ventana_runge, columns=columnas_runge, show="headings")
+        
+        # Configurar los encabezados de las columnas
+        for col in columnas_runge:
+            tabla_runge.heading(col, text=col)
+            tabla_runge.column(col, anchor="center")
+        
+        # Crear scrollbar horizontal
+        scrollbar_horizontal = tk.Scrollbar(ventana_runge, orient="horizontal", command=tabla_runge.xview)
+        scrollbar_horizontal.pack(fill="x", side="bottom")
+
+        # Crear scrollbar vertical
+        scrollbar_vertical = tk.Scrollbar(ventana_runge, orient="vertical", command=tabla_runge.yview)
+        scrollbar_vertical.pack(fill="y", side="right")
+
+        # Asociar las scrollbars con la tabla
+        tabla_runge.configure(xscrollcommand=scrollbar_horizontal.set, yscrollcommand=scrollbar_vertical.set)
+        
+        # Agregar la tabla a la ventana
+        tabla_runge.pack(expand=True, fill="both")
+        
+        h = self.h
         m = 0
         t = 0
-        Mcorte = random.uniform(2000,20000)
+        Mcorte = random.uniform(self.limiteInferiorM,self.limiteSuperiorM)
+        self.M = Mcorte
         
         while m <= Mcorte:
-            k1 = 3*t**2+0.5*m
-            k2 = 3*(t+h/2)**2+0.5*(m+h/2*k1)
-            k3 = 3*(t+h/2)**2+0.5*(m+h/2*k2)
-            k4 = 3*(t+h)**2+0.5*(m+h*k3)
+            k1 = self.coeficienteT*t**2+self.coeficienteM*m
+            k2 = self.coeficienteT*(t+h/2)**2+self.coeficienteM*(m+h/2*k1)
+            k3 = self.coeficienteT*(t+h/2)**2+self.coeficienteM*(m+h/2*k2)
+            k4 = self.coeficienteT*(t+h)**2+self.coeficienteM*(m+h*k3)
+            vector_runge = [t, m, k1, k2, k3, k4]
             m = m + (h/6) *(k1+2*k2+2*k3+k4)
             t += h
+            vector_runge.append(t)
+            vector_runge.append(m)
+            vector_runge = [round(elemento, 4) if isinstance(elemento, float) else elemento for elemento in vector_runge]
+            tabla_runge.insert("", "end", values=vector_runge)
             
         return round((t/0.1/60),2)
     
@@ -185,7 +229,8 @@ class Simulacion:
     
 
     def terminarTurno(self):
-        demora_limpieza = self.runge_kutta()
+        demora_limpieza = self.runge_kutta(self.acumuladorLimpieza)
+        self.acumuladorLimpieza += 1
         self.limpieza = demora_limpieza
         self.cancha.terminarTurno()
         self.finLimpieza = self.reloj + demora_limpieza # Seteo el fin de limpieza
@@ -311,6 +356,8 @@ class Simulacion:
             self.cola.getCantidadGrupos(),
             self.cancha.getTipoGrupo(),
             *self.cancha.getVectorOcupacion(),
+            self.M,
+            self.limpieza,
             self.finLimpieza if self.finLimpieza != None else '',
             self.tiempo_cola_f,
             self.cantidad_grupo_f,
@@ -331,6 +378,8 @@ class Simulacion:
         fila = ['' if None else elemento for elemento in fila]
 
         self.tabla.insert("", "end", values=fila)
+        
+        
     
 
     def setTabla(self, tabla):

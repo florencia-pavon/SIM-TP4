@@ -2,11 +2,17 @@ import math
 import random
 
 
-def validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme):
+def validar_datos(valor_tiempo_x, iteracion_i, hora_j, cantidad_cola_max, futbol_llegada_media, handball_llegada_uniforme, basketball_llegada_uniforme, futbol_ocupacion_uniforme, handball_ocupacion_uniforme, basketball_ocupacion_uniforme, h, coef_t, coef_M, lim_M):
     
     if valor_tiempo_x <= 0:
         return False
     
+    if h <= 0 or coef_t<= 0 or coef_M <= 0 or lim_M[0] < 0 or lim_M[1] <0 :
+        return False
+    
+    if lim_M[0] >= lim_M[1]:
+        return False
+ 
     if iteracion_i > 100000 and iteracion_i <= 0:
         return False
     
